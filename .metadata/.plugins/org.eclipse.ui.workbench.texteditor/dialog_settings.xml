@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="getJsonString" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="min"/>
+			<item value="\&quot;"/>
+		</list>
+		<list key="replacehistory">
+			<item value="max"/>
+			<item value="&apos;"/>
+		</list>
+	</section>
+</section>

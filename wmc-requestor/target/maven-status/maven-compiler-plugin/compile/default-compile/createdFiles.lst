@@ -1,0 +1,15 @@
+com\bahn\wmc\requestor\bean\Include.class
+com\bahn\wmc\requestor\bean\Order.class
+com\bahn\wmc\requestor\bean\ItemDescription.class
+com\bahn\wmc\test\Test.class
+com\bahn\wmc\requestor\ItemsBean\ItemsPayload.class
+com\bahn\wmc\requestor\bean\ItemsInSet.class
+com\bahn\wmc\requestor\bean\Payload.class
+com\bahn\wmc\requestor\bean\WmcJsonBean.class
+com\bahn\wmc\requestor\bean\Item.class
+com\bahn\wmc\requestor\ItemsBean\WmcItemsBean.class
+com\bahn\wmc\requestor\ItemsBean\Items.class
+com\bahn\wmc\requestor\Requestor.class
+com\bahn\wmc\itemlist\bean\DBItem.class
+com\bahn\wmc\itemlist\ItemListReader.class
+com\bahn\wmc\requestor\bean\User.class

@@ -1,0 +1,144 @@
+package com.bahn.wmc.service;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.bahn.wmc.itemlist.ItemListReader;
+import com.bahn.wmc.requestor.Requestor;
+import com.bahn.wmc.requestor.bean.Order;
+import com.bahn.wmc.requestor.bean.WmcJsonBean;
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+
+public class CrawlerService {
+	
+	private UserPrefs prefs = null;
+	private Map<String,String> itemNameMap = null;
+	private List<String> userItems = null;
+	
+	public CrawlerService(){
+		
+	}
+
+	public CrawlerService(File userJson) throws Exception{
+		String jarDir = new File(CrawlerService.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+		File f = new File (jarDir + "\\" + userJson.getPath());
+		if ( f.isFile()){
+			getUserPrefs(f);
+		} else {
+			
+		}
+		retrieveItemDB();
+	}
+	
+	public void retrieveItemDB() throws Exception {
+		ItemListReader reader = new ItemListReader();
+		itemNameMap = reader.getItemList();
+	}
+	
+	public void getUserPrefs(File prefFile) throws JsonSyntaxException, JsonIOException, FileNotFoundException {
+		Gson gson = new Gson();
+		UserPrefs bean = gson.fromJson(new FileReader(prefFile), UserPrefs.class);
+		prefs = bean;
+		for (String str : bean.items){
+			str = str.toLowerCase();
+		}
+		userItems = bean.items;
+	}
+	
+	public void getUserPrefs(List<String> userItems){
+		this.userItems = userItems;
+	}
+	
+	public List<WmcJsonBean> getData(List<String> itemList) throws Exception{
+		if (itemList == null ) {
+			itemList = userItems;
+		}
+		List<WmcJsonBean> list = new ArrayList<WmcJsonBean>();
+		Requestor requestor = new Requestor();
+		
+		for (String item : itemList){
+			String itemUrl = itemNameMap.getOrDefault(item, item);
+			WmcJsonBean bean = requestor.getJsonBean(itemUrl);
+			list.add(bean);
+		}
+		
+		return list;
+	}
+	
+	public Map<WmcJsonBean,Integer> getMinSellPrices(List<WmcJsonBean> list){
+		Map<WmcJsonBean,Integer> map = new HashMap<WmcJsonBean,Integer>();
+		for (WmcJsonBean bean : list){
+			int min = Integer.MAX_VALUE;
+			for (Order order : bean.payload.orders){
+				if (order.orderType.equals("sell") && order.user.status.equals("ingame")){
+					if (min>order.platinum){
+						min = order.platinum;
+					}
+				}
+			}
+			
+			map.put(bean, min);
+		}
+		return map;
+	}
+	
+	public Map<WmcJsonBean,Integer> getMaxBuyPrices(List<WmcJsonBean> list){
+		Map<WmcJsonBean,Integer> map = new HashMap<WmcJsonBean,Integer>();
+		for (WmcJsonBean bean : list){
+			int max = 0;
+			for (Order order : bean.payload.orders){
+				if (order.orderType.equals("buy") && order.user.status.equals("ingame")){
+					if (max<order.platinum){
+						max = order.platinum;
+					}
+				}
+			}
+			
+			map.put(bean, max);
+		}
+		return map;
+	}
+	
+	public List<String> getRequestedItems(File f) throws JsonSyntaxException, JsonIOException, FileNotFoundException{
+		List<String> list = new ArrayList<String>();
+		
+		Gson gson = new Gson();
+		UserPrefs bean = gson.fromJson(new FileReader(f), UserPrefs.class);
+		return bean.items;
+	}
+	
+	public static void main(String[] args) {
+//		CrawlerService service = new CrawlerService();
+		try {
+			
+			
+			System.out.println("Warframe Market Crawler 1.0.1");
+			System.out.println((new File("")).getAbsolutePath());
+			CrawlerService serv = new CrawlerService(new File("src/main/resources/user.json"));
+			System.out.println("================================================");
+			for (String i : serv.userItems){
+				System.out.println(i);
+			}
+			System.out.println("_________________");
+			List<WmcJsonBean> beanList = serv.getData(null);
+			
+			int i=0;
+			for (WmcJsonBean item : beanList){
+				System.out.println("========================================");
+				System.out.println(serv.userItems.get(i++));
+				System.out.println("min sell: " + serv.getMinSellPrices(beanList).get(item));
+				System.out.println("max buy: " + serv.getMaxBuyPrices(beanList).get(item));
+			}
+			
+		} catch (Exception e){
+			e.printStackTrace();
+		}
+	}
+}

@@ -1,0 +1,18 @@
+package com.bahn.wmc.itemlist;
+
+import java.util.Map;
+
+public class ItemListReader {
+	
+	public Map<String,String> getItemList(){
+		Map map = new HashMap<String,String>();
+		
+		return map;
+		
+	}
+	
+	public static void main (String[] args){
+		
+	}
+
+}

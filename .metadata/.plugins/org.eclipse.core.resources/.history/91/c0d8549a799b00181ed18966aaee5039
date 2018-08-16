@@ -1,0 +1,36 @@
+package com.bahn.wmc.itemlist;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.bahn.wmc.requestor.ItemsBean.WmcItemsBean;
+import com.bahn.wmc.requestor.bean.ItemDescription;
+import com.google.gson.Gson;
+
+public class ItemListReader {
+	
+	private String getRequest(URL url) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	public Map getItemList() throws Exception {
+		
+		Gson gson = new Gson();
+		WmcItemsBean bean = new Gson().fromJson(getRequest(new URL("https://api.warframe.market/v1/items")), WmcItemsBean.class);
+		Map <String,String> map = new HashMap<String,String>();
+		for (ItemDescription item : bean.payload.items.en) {
+			map.put(item.itemName, item.url_name);
+		}
+		
+		return map;
+	}
+	
+
+
+	public static void main (String[] args){
+		
+	}
+
+}

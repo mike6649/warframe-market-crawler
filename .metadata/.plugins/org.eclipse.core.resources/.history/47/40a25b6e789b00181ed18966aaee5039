@@ -1,0 +1,108 @@
+package com.bahn.wmc.requestor;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Map;
+
+import com.bahn.wmc.requestor.ItemsBean.WmcItemsBean;
+import com.bahn.wmc.requestor.bean.WmcJsonBean;
+import com.google.gson.Gson;
+
+public class Requestor {
+
+	public Requestor(){
+
+	}
+	
+	private Reader getRequest(URL url) throws Exception {
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+		con.setRequestMethod("GET");
+		con.setConnectTimeout(10000);
+		con.setReadTimeout(10000);
+
+		int status = 0;
+		try {
+			status = con.getResponseCode();
+		} catch (Exception e){
+			throw new Exception ("Failed to get response from " + url.toString());
+		}
+		
+		if (status != 200){
+			throw new Exception ("HTTP Request to " + url.toString() + " returned status: " + status);
+		}
+		
+		System.out.println("Successfully retrieved response from: " + url.toString());
+		
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(con.getInputStream()),1000 * 8192);
+		
+		return in;
+	}
+	
+	private String getFileContent(String filePath) {
+	    StringBuilder contentBuilder = new StringBuilder();
+	    try (BufferedReader br = new BufferedReader(new FileReader(filePath)))
+	    {
+	 
+	        String sCurrentLine;
+	        while ((sCurrentLine = br.readLine()) != null)
+	        {
+	            contentBuilder.append(sCurrentLine).append("\n");
+	        }
+	    }
+	    catch (IOException e)
+	    {
+	        e.printStackTrace();
+	    }
+	    return contentBuilder.toString();
+	}
+
+	private Reader getJsonStream(String itemName) throws Exception{
+		URL url = new URL("https://api.warframe.market/v1/items/" + itemName + "/orders?include=item");
+		
+		return getRequest(url);
+		
+	}
+	
+	private String getJsonString(String itemName) throws Exception{
+		BufferedReader in = (BufferedReader)this.getJsonStream(itemName);
+		String inputLine;
+		StringBuffer content = new StringBuffer();
+		while ((inputLine = in.readLine()) != null) {
+			content.append(inputLine);
+		}
+		in.close();
+		return content.toString();
+	}
+
+	public WmcJsonBean getJsonBean(String itemName) throws Exception{
+		WmcJsonBean bean;
+		Gson gson = new Gson();
+
+		bean = gson.fromJson(getJsonStream(itemName), WmcJsonBean.class);
+		return bean;
+	}
+	
+	public Map getItemList() throws Exception {
+		
+		Gson gson = new Gson();
+		WmcItemsBean bean = new Gson().fromJson(getRequest(new URL("https://api.warframe.market/v1/items")), WmcItemsBean.class);
+		for (ItemDescription item : bean.payload.items.en) {
+			
+		}
+		
+		return son;
+	}
+
+	public static void main(String[] args) {
+		File f = new File("items");
+		System.out.println(f.getAbsoluteFile().getPath());
+	}
+
+}

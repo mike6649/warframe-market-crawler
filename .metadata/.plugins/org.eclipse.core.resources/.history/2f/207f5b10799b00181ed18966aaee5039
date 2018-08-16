@@ -1,0 +1,5 @@
+package com.bahn.wmc.requestor.ItemsBean.copy;
+
+public class ItemsPayload {
+	public Items items;
+}

@@ -1,0 +1,7 @@
+package com.bahn.wmc.requestor.ItemsBean;
+
+import java.util.List;
+
+public class Items {
+	public List<EnItem> en;
+}
